@@ -7,13 +7,13 @@ public class UCS {
 
 	public void addToFrontier(State state){
 		int size = frontier.size();
-		//for empty frontier
 		for (int i=0; i<size; i++) {
 			if (state.cost < frontier.get(i).cost) {
 				frontier.add(i, state);//found pos of state
 				return;
 			}
 		}
+		//for empty frontier or for biggest element
 		frontier.add(state);
 	}
 
