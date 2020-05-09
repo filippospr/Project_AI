@@ -8,17 +8,13 @@ public class UCS {
 	public void addToFrontier(State state){
 		int size = frontier.size();
 		//for empty frontier
-		if (size == 0){
-			frontier.add(state);
-			return;
-		}
-
 		for (int i=0; i<size; i++) {
 			if (state.cost < frontier.get(i).cost) {
 				frontier.add(i, state);//found pos of state
-				break;
+				return;
 			}
 		}
+		frontier.add(state);
 	}
 
 	/*Removes the first element of the frontier since it is sorted*/
