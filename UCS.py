@@ -12,12 +12,13 @@ def main():
 	else:
 		n = int(sys.argv[1])
 	s = shuffle(n)
-	print(s)
+	print('The input will be:', s)
+	#write the string in a file
 	with open("string.txt", "w") as f:
 		f.write(s)
-	os.system("javac UCS.java")
-	os.system("java UCS < string.txt")
-	os.remove("string.txt")
+	os.system("javac UCS.java") #compile UCS.java
+	os.system("java UCS < string.txt") #give the file as input to UCS
+	os.remove("string.txt") #remove file
 
 if __name__ == '__main__':
 	main()
