@@ -19,6 +19,8 @@ def main():
 	os.system("javac UCS.java") #compile UCS.java
 	os.system("java UCS < string.txt") #give the file as input to UCS
 	os.remove("string.txt") #remove file
+	os.remove("UCS$State.class") #remove classes
+	os.remove("UCS.class") #remove classes
 
 if __name__ == '__main__':
 	main()
