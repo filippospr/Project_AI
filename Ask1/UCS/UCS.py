@@ -5,12 +5,7 @@ def shuffle(n):
 	random.shuffle(l)
 	return "".join(l)
 
-def main():
-	if len(sys.argv) != 2:
-		print('Give an number n as an argument')
-		return
-	else:
-		n = int(sys.argv[1])
+def main(n):
 	s = shuffle(n)
 	print('The input will be:', s)
 	#write the string in a file
@@ -23,4 +18,8 @@ def main():
 	os.remove("UCS.class") #remove classes
 
 if __name__ == '__main__':
-	main()
+	if len(sys.argv) != 2:
+		print('Give an number n as an argument')
+	else:
+		n = int(sys.argv[1])
+		main(n)

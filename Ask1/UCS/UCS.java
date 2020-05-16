@@ -5,6 +5,7 @@ public class UCS {
 	private ArrayList<State> frontier = new ArrayList<State>();
 	private HashSet<String> closedSet = new HashSet<String>();
 	private ArrayList<State> finalStates = new ArrayList<State>();
+	int N;
 
 	//adds a new state to frontier
 	public void addToFrontier(State state){
@@ -55,8 +56,11 @@ public class UCS {
 				child[i] = child[pos];
 				child[pos] = temp;
 				//calculate cost
-				int cost = state.cost + Math.abs(pos-i);
-				children.add(new State(new String(child), cost, state));
+				int cost = Math.abs(pos-i);
+				if (cost <= N){
+					cost = state.cost + cost;
+					children.add(new State(new String(child), cost, state));
+				}
 			}
 		}
 		return children;
@@ -80,6 +84,7 @@ public class UCS {
 
 	//find final state with min cost
 	public State findBestSolution(){
+		//System.out.println(finalStates);
 		State minState = finalStates.get(0);
 		for (State state: finalStates)
 			if (state.cost<minState.cost)
@@ -102,6 +107,7 @@ public class UCS {
 				dash = true;
 			else return false;
 		}
+		N = blacks;
 		return blacks == whites && dash;
 	}
 
@@ -169,6 +175,6 @@ public class UCS {
 		//used for tests
 		/*public String toString(){
 			return state+':'+cost;
-		}*/
+		}/**/
 	}
 }
