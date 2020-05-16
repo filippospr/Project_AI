@@ -1,17 +1,16 @@
 import java.lang.Math;
 import java.util.*;
 
-public class UCS {
+public class A_star {
 	private ArrayList<State> frontier = new ArrayList<State>();
 	private HashSet<String> closedSet = new HashSet<String>();
-	private ArrayList<State> finalStates = new ArrayList<State>();
-	int N;
+	static int N;
 
 	//adds a new state to frontier
 	public void addToFrontier(State state){
 		int size = frontier.size();
 		for (int i=0; i<size; i++) {
-			if (state.cost < frontier.get(i).cost) {
+			if (state.estimated_cost < frontier.get(i).estimated_cost) {
 				frontier.add(i, state);//found pos of state
 				return;
 			}
@@ -39,11 +38,6 @@ public class UCS {
 		closedSet.add(state.state);
 	}
 
-	//final state list
-	public void addFinalState(State state){
-		finalStates.add(state);
-	}
-
 	public ArrayList<State> createChildren(State state){
 		ArrayList<State> children = new ArrayList<State>();
 		int pos = state.state.indexOf('-');
@@ -67,7 +61,7 @@ public class UCS {
 	}
 
 
-	public boolean isFinalState(State state){
+	public boolean isFinalState(State state) {
 		char[] fState = state.state.toCharArray();
 		int blacks = 0;
 
@@ -80,16 +74,6 @@ public class UCS {
 				return false;
 		}
 		return true;
-	}
-
-	//find final state with min cost
-	public State findBestSolution(){
-		//System.out.println(finalStates);
-		State minState = finalStates.get(0);
-		for (State state: finalStates)
-			if (state.cost<minState.cost)
-				minState = state;
-		return minState;
 	}
 
 	//check if initial state is valid
@@ -112,55 +96,53 @@ public class UCS {
 	}
 
 	public static void main(String[] args) {
-		UCS ucs = new UCS();
+		A_star astar = new A_star();
 		Scanner scanner = new Scanner(System.in);
 		String input = "";
 		int extensions = 0;
 		//Get Starting state
-		while(!ucs.isValidState(input)){
+		while(!astar.isValidState(input)){
 			System.out.print("Give me a starting state: ");
 			input = scanner.nextLine();
 			System.out.println();
 		}
 		long startTime = System.currentTimeMillis();
 		State state = new State(input, 0);
-		ucs.addToFrontier(state);//Step 1
+		astar.addToFrontier(state);//Step 1
 		ArrayList<State> children;
-		//System.out.printf("Starting state is:%s\n",state);
-		while(!ucs.frontierIsEmpty()){//Step 2
+		while(!astar.frontierIsEmpty()){//Step 2
 			//System.out.printf("Removing state %s from frontier\n",state);
-			state = ucs.removeFromFrontier();//Step 3
-			if (ucs.inClosedSet(state))//Step 4
+			state = astar.removeFromFrontier();//Step 3
+			if (astar.inClosedSet(state))//Step 4
 				continue;
-			if (ucs.isFinalState(state)){//Step 5
-				//System.out.printf("State %s is Final add to Fstate list\n",state);
-				ucs.addFinalState(state);
-				continue;//6
+			//Should stop here for Greedy Search
+			if (astar.isFinalState(state)){//Step 5
+				break;
 			}
 			//System.out.printf("Creating children of state %s\n",state);
-			children = ucs.createChildren(state);//Step 7
+			children = astar.createChildren(state);//Step 6
 			//System.out.printf("Adding children of state %s to frontier\n",state);
 			for (State child: children)
-				ucs.addToFrontier(child);//Step 8
+				astar.addToFrontier(child);//Step 7
 			extensions++;
 			//System.out.printf("Adding state %s to Closed Set\n",state);
-			ucs.addToClosedSet(state);//Step 9
+			astar.addToClosedSet(state);//Step 8
 		}
-		State solution = ucs.findBestSolution();
-		System.out.printf("Best path is: %s\nCost is %d\n", solution.getPath(), solution.cost);
+		//System.out.printf("Best path is: %s\nCost is %d\n", state.getPath(), state.cost);
 		System.out.println("Total extensions: " + extensions);
 		System.out.println(System.currentTimeMillis() - startTime);
 	}
 
 	static class State{
 		String state;
-		int cost;
+		int cost, estimated_cost;//cost=g(n), and heuristic_cost=h(n)
 		ArrayList<String> path = new ArrayList<String>();
 
-		State(String state, int cost){
+		State(String state, int cost) {
 			this.state = state;
 			this.cost = cost;
 			path.add(state);
+			estimated_cost = cost + heuristicCost();
 		}
 
 		State(String state, int cost, State parent){
@@ -168,6 +150,34 @@ public class UCS {
 			this.cost = cost;
 			path.addAll(parent.path);
 			path.add(state);
+			estimated_cost = cost + heuristicCost();
+		}
+
+		//calculate heuristic function h(n)
+		int heuristicCost(){
+			char[] chars = state.toCharArray();
+			ArrayList<Integer> whites = new ArrayList<Integer>();
+			int cost = 0, pos;
+			//find the pos of all whites on left side
+			//System.out.println("find whites");
+			for (int c=0; c<=N;c++){
+				//System.out.println(chars[c]);
+				if (chars[c] == 'A')
+					whites.add(c);
+			}
+			//System.out.println("done whites");
+			//no whites on left side
+			if (whites.size() == 0)
+				return 0;
+
+			pos = whites.get(0);
+
+			//match whites on left with blacks on right
+			for (int c=N+1; c<2*N+1;c++) {
+				if (chars[c] == 'M')
+					cost += c-pos;
+			}
+			return cost;
 		}
 
 		//get path of state
