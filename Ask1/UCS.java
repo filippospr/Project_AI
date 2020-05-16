@@ -122,7 +122,6 @@ public class UCS {
 			input = scanner.nextLine();
 			System.out.println();
 		}
-		long startTime = System.currentTimeMillis();
 		State state = new State(input, 0);
 		ucs.addToFrontier(state);//Step 1
 		ArrayList<State> children;
@@ -149,7 +148,6 @@ public class UCS {
 		State solution = ucs.findBestSolution();
 		System.out.printf("Best path is: %s\nCost is %d\n", solution.getPath(), solution.cost);
 		System.out.println("Total extensions: " + extensions);
-		System.out.println(System.currentTimeMillis() - startTime);
 	}
 
 	static class State{

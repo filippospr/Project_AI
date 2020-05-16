@@ -7,7 +7,7 @@ public class A_star {
 	static int N;
 
 	//adds a new state to frontier
-	public void addToFrontier(State state){
+	public void addToFrontier(State state) {
 		int size = frontier.size();
 		for (int i=0; i<size; i++) {
 			if (state.estimated_cost < frontier.get(i).estimated_cost) {
@@ -20,38 +20,38 @@ public class A_star {
 	}
 
 	/*Removes the first element of the frontier*/
-	public State removeFromFrontier(){
+	public State removeFromFrontier() {
 		if (frontier.size() == 0)
 			return null;//frontier empty return null
 		return frontier.remove(0);
 	}
 
-	public boolean frontierIsEmpty(){
+	public boolean frontierIsEmpty() {
 		return frontier.size() == 0;
 	}
 	//closed set
-	public boolean inClosedSet(State state){
+	public boolean inClosedSet(State state) {
 		return closedSet.contains(state.state);
 	}
 
-	public void addToClosedSet(State state){
+	public void addToClosedSet(State state) {
 		closedSet.add(state.state);
 	}
 
-	public ArrayList<State> createChildren(State state){
+	public ArrayList<State> createChildren(State state) {
 		ArrayList<State> children = new ArrayList<State>();
 		int pos = state.state.indexOf('-');
 
 		for (int i=0; i<state.state.length(); i++) {
 			char[] child = state.state.toCharArray();
-			if (i != pos){
+			if (i != pos) {
 				//Swap '-' with another character
 				char temp = child[i];
 				child[i] = child[pos];
 				child[pos] = temp;
 				//calculate cost
 				int cost = Math.abs(pos-i);
-				if (cost <= N){
+				if (cost <= N) {
 					cost = state.cost + cost;
 					children.add(new State(new String(child), cost, state));
 				}
@@ -65,7 +65,7 @@ public class A_star {
 		char[] fState = state.state.toCharArray();
 		int blacks = 0;
 
-		for(int i=0; i<fState.length; i++){
+		for(int i=0; i<fState.length; i++) {
 			if (fState[i] == 'M')
 				blacks++;
 			else if(fState[i] == 'A' && blacks < (fState.length-1)/2)//all blacks need to be left
@@ -77,7 +77,7 @@ public class A_star {
 	}
 
 	//check if initial state is valid
-	public boolean isValidState(String state){
+	public boolean isValidState(String state) {
 		char[] chars = state.toCharArray();
 		int blacks = 0, whites = 0;
 		boolean dash = false;
@@ -101,22 +101,21 @@ public class A_star {
 		String input = "";
 		int extensions = 0;
 		//Get Starting state
-		while(!astar.isValidState(input)){
+		while(!astar.isValidState(input)) {
 			System.out.print("Give me a starting state: ");
 			input = scanner.nextLine();
 			System.out.println();
 		}
-		long startTime = System.currentTimeMillis();
 		State state = new State(input, 0);
 		astar.addToFrontier(state);//Step 1
 		ArrayList<State> children;
-		while(!astar.frontierIsEmpty()){//Step 2
+		while(!astar.frontierIsEmpty()) {//Step 2
 			//System.out.printf("Removing state %s from frontier\n",state);
 			state = astar.removeFromFrontier();//Step 3
 			if (astar.inClosedSet(state))//Step 4
 				continue;
 			//Should stop here for Greedy Search
-			if (astar.isFinalState(state)){//Step 5
+			if (astar.isFinalState(state)) {//Step 5
 				break;
 			}
 			//System.out.printf("Creating children of state %s\n",state);
@@ -128,9 +127,8 @@ public class A_star {
 			//System.out.printf("Adding state %s to Closed Set\n",state);
 			astar.addToClosedSet(state);//Step 8
 		}
-		//System.out.printf("Best path is: %s\nCost is %d\n", state.getPath(), state.cost);
+		System.out.printf("Best path is: %s\nCost is %d\n", state.getPath(), state.cost);
 		System.out.println("Total extensions: " + extensions);
-		System.out.println(System.currentTimeMillis() - startTime);
 	}
 
 	static class State{
@@ -188,7 +186,7 @@ public class A_star {
 			return result;
 		}
 		//used for tests
-		/*public String toString(){
+		/*public String toString() {
 			return state+':'+cost;
 		}/**/
 	}
