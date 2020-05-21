@@ -4,8 +4,6 @@ import java.util.Scanner;
 
 public class SOS {
 
-	static int nodes = 0;
-	static int aiWins = 0;
 	//creates children of state
 	public static void createChildren(State state) {
 		if (!state.isFinal) {
@@ -19,19 +17,17 @@ public class SOS {
 	}
 
 	public static void createGameTree(State state) {
-		nodes++;
-		if (state.isFinal) {
-			if (state.isAI && state.value == 1)
-				aiWins++;
+		if (state.isFinal)
 			return;
-		}
 		createChildren(state);
+		//initialize v
 		int v = 1;
 		if (state.isAI)
 			v = -1;
 
 		for (State child: state.children) {
 			createGameTree(child);
+			//find max value for AI nodes and min value for player nodes
 			if((child.value > v && state.isAI) || (child.value < v && !state.isAI))
 				v = child.value;
 		}
@@ -50,35 +46,37 @@ public class SOS {
 		return emptyPosList;
 	}
 
+	public static boolean isValidMove(State gameState, char c, int[] pos) {
+		if (c != 'S' && c != 'O')//invalid letter
+			return false;
+		if (pos[0] > 3 || pos[0] < 0 || pos[1] > 3 || pos[1] < 0)//out of bounds
+			return false;
+		if (gameState.grid[pos[0]][pos[1]] != ' ')//position already taken
+			return false;
+		return true;
+	} 
+
 
 
 	public static void main(String[] args) {
-		System.out.println("Building Game Tree...");
+		System.out.print("Building Game Tree...");
+
 		char[][] startingState = new char[][]{{' ',' ',' '}, {' ',' ',' '}, {' ',' ',' '}};
 		State gameState = new State(startingState, true, new int[]{1,2}, 'O');
+		//create whole game tree
 		createGameTree(gameState);
+		System.out.println("Done");
+
 		Scanner input = new Scanner(System.in);
 		gameState.printState();
-		
-		if (args.length == 2){
-			if (args[1].equals("-t")){
-				return;
-			}
-			for(int i=0; i<Integer.parseInt(args[1]);i++){
-				test(gameState);
-			}
-			return;
-		}
-
+		//Begin game
 		while (!gameState.isFinal){
 			System.out.println("AI's turn");
 			int maxValue = gameState.children.get(0).value;
 			State maxChild = gameState.children.get(0);
 			
-			//find the child with max value
-			System.out.println(gameState.isAI);
+			//find the child with max value	
 			for (State child: gameState.children){
-				System.out.println(child.isAI);
 				if (child.value > maxValue){
 					maxValue = child.value;
 					maxChild = child;
@@ -87,12 +85,19 @@ public class SOS {
 			}
 			gameState = maxChild;
 			gameState.printState();
+			//AI wins or draw
 			if (gameState.isFinal)
 				break;
 
-			System.out.println("Plz enter S or O and its coordinates (ex. O 1 2)");
-			char c = input.next().charAt(0);
-			int[] pos = new int[]{input.nextInt(), input.nextInt()};//TODO: check if invalid not S/O or bad coordinates
+			char c = ' ';
+			int[] pos = new int[2];
+			while (!isValidMove(gameState, c, pos)){
+				System.out.println("Plz enter S or O and its coordinates (ex. O 1 2)");
+				c = Character.toUpperCase(input.next().charAt(0));
+				pos[0] =input.nextInt();
+				pos[1] =input.nextInt();
+			}
+			//find child that matches with player's move
 			for (State child: gameState.children){
 				if (child.grid[pos[0]][pos[1]] == c){
 					gameState = child;
@@ -109,47 +114,6 @@ public class SOS {
 			 System.out.println("Player wins!!");
 		else
 			System.out.println("It's a draw");
-
-		//System.out.println(root.value);
-		//System.out.printf("Nodes=%d\nAI_Wins=%d\n",nodes,aiWins);
-		/*createChildren(root);
-		System.out.println(root.children.size());
-		for(State child: root.children){
-			System.out.println("--------------------------------------------");
-			child.printState();
-		}*/
-	}
-
-	public static void test(State gameState){
-		while (!gameState.isFinal){
-			int maxValue = gameState.children.get(0).value;
-			State maxChild = gameState.children.get(0);
-			
-			//find the child with max value
-			for (State child: gameState.children){
-				if (child.value > maxValue){
-					maxValue = child.value;
-					maxChild = child;
-					break;
-				}
-			}
-			gameState = maxChild;
-			if (gameState.isFinal)
-				break;
-			maxValue = gameState.children.get(0).value;
-			maxChild = gameState.children.get(0);
-			
-			//find the child with max value
-			for (State child: gameState.children){
-				if (child.value < maxValue){
-					maxValue = child.value;
-					maxChild = child;
-					break;
-				}
-			}
-			gameState = maxChild;
-		}
-		System.out.println(gameState.value);
 	}
 
 	static class State {
@@ -160,23 +124,22 @@ public class SOS {
 		ArrayList<State> children;
 
 		State(char[][] grid, boolean isAI, int[] pos, char c) {
+			//copy grid from parent and add the new char
 			for (int i=0; i < 3; i++)
 				for (int j=0; j < 3; j++) {
-
 					this.grid[i][j] = grid[i][j];
 					//add char at pos
 					if (i == pos[0] && j ==pos[1])
 						this.grid[i][j] = c;
 				}
-
 			this.isAI = isAI;
 			isFinalState(pos, c);
 			if (!isFinal) children = new ArrayList<State>();
 		}
 
 		private void isFinalState(int[] pos, char c) {
-			//ArrayList<int[]> neighbours = findNeighbours(pos);
-			for (int i = Math.max(0, pos[0]-1); i <= Math.min(2, pos[0]+1); i++)
+			//check all chars adjacent to pos
+			for (int i = Math.max(0, pos[0]-1); i <= Math.min(2, pos[0]+1); i++){
 				for (int j = Math.max(0, pos[1]-1); j <= Math.min(2, pos[1]+1); j++){
 					if(i != pos[0] || j != pos[1] && grid[i][j] != ' '){
 						int[] neighbour = new int[]{i,j};
@@ -190,36 +153,28 @@ public class SOS {
 							x = 2*neighbour[0] - pos[0];
 							y = 2*neighbour[1] - pos[1];
 						}
-
-						if (x < 3 && y < 3 && x >= 0 && y >= 0)
-								if (grid[x][y] == 'S') {
-									isFinal = true;
-									//1 AI wins -1 player wins
-									if (isAI) value = -1;
-									else value = 1;
-									
-									return;
-								}
+						if (x < 3 && y < 3 && x >= 0 && y >= 0){
+							//look for the last S
+							if (grid[x][y] == 'S') {
+								isFinal = true;
+								//1 AI wins -1 player wins
+								if (isAI) value = -1;
+								else value = 1;	
+								return;
+							}
+						}
+					}
 				}
 			}
+			//check if there are cells in the grid
 			for (char[] line: grid)
 				for (char chr: line)
 					if (chr == ' ')
 						return;
+			//no empty cells it's a draw
 			isFinal = true;
 			value = 0;
 		}
-
-		/*private ArrayList<int[]> findNeighbours(int[] pos) {
-			ArrayList<int[]> neighbours = new ArrayList<int[]>();
-			
-			for (int i = Math.max(0, pos[0]-1); i <= Math.min(2, pos[0]+1); i++)
-				for (int j = Math.max(0, pos[1]-1); j <= Math.min(2, pos[1]+1); j++){
-					if(i != pos[0] || j != pos[1] && grid[i][j] != ' ')
-						neighbours.add(new int[]{i, j});
-				}
-			return neighbours;
-		}*/
 
 		void printState() {
 			for (char[] line: grid) {
