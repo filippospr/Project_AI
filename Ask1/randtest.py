@@ -3,7 +3,7 @@ import random, sys, os
 def shuffle(n):
 	l = ["M" for i in range(n)] + ["A" for i in range(n)] + ["-"]
 	random.shuffle(l)
-	return "".join(l)
+	return "".join(l)+"\n"
 
 def main(n):
 	s = shuffle(n)
