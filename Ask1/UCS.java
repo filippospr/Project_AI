@@ -8,7 +8,7 @@ public class UCS {
 	int N;
 
 	//adds a new state to frontier
-	public void addToFrontier(State state){
+	public void addToFrontier(State state) {
 		int size = frontier.size();
 		for (int i=0; i<size; i++) {
 			if (state.cost < frontier.get(i).cost) {
@@ -21,30 +21,30 @@ public class UCS {
 	}
 
 	/*Removes the first element of the frontier*/
-	public State removeFromFrontier(){
+	public State removeFromFrontier() {
 		if (frontier.size() == 0)
 			return null;//frontier empty return null
 		return frontier.remove(0);
 	}
 
-	public boolean frontierIsEmpty(){
+	public boolean frontierIsEmpty() {
 		return frontier.size() == 0;
 	}
 	//closed set
-	public boolean inClosedSet(State state){
+	public boolean inClosedSet(State state) {
 		return closedSet.contains(state.state);
 	}
 
-	public void addToClosedSet(State state){
+	public void addToClosedSet(State state) {
 		closedSet.add(state.state);
 	}
 
 	//final state list
-	public void addFinalState(State state){
+	public void addFinalState(State state) {
 		finalStates.add(state);
 	}
 
-	public ArrayList<State> createChildren(State state){
+	public ArrayList<State> createChildren(State state) {
 		ArrayList<State> children = new ArrayList<State>();
 		int pos = state.state.indexOf('-');
 
@@ -67,7 +67,7 @@ public class UCS {
 	}
 
 
-	public boolean isFinalState(State state){
+	public boolean isFinalState(State state) {
 		char[] fState = state.state.toCharArray();
 		int blacks = 0;
 
@@ -83,7 +83,7 @@ public class UCS {
 	}
 
 	//find final state with min cost
-	public State findBestSolution(){
+	public State findBestSolution() {
 		//System.out.println(finalStates);
 		State minState = finalStates.get(0);
 		for (State state: finalStates)
@@ -93,7 +93,7 @@ public class UCS {
 	}
 
 	//check if initial state is valid
-	public boolean isValidState(String state){
+	public boolean isValidState(String state) {
 		char[] chars = state.toCharArray();
 		int blacks = 0, whites = 0;
 		boolean dash = false;
@@ -150,7 +150,7 @@ public class UCS {
 		System.out.println("Total extensions: " + extensions);
 	}
 
-	static class State{
+	static class State {
 		String state;
 		int cost;
 		ArrayList<String> path = new ArrayList<String>();
