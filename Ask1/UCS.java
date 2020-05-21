@@ -20,7 +20,7 @@ public class UCS {
 		frontier.add(state);
 	}
 
-	/*Removes the first element of the frontier*/
+	/*Removes the first element from the frontier*/
 	public State removeFromFrontier() {
 		if (frontier.size() == 0)
 			return null;//frontier empty return null
@@ -30,7 +30,8 @@ public class UCS {
 	public boolean frontierIsEmpty() {
 		return frontier.size() == 0;
 	}
-	//closed set
+	
+	//check if state is in closed set
 	public boolean inClosedSet(State state) {
 		return closedSet.contains(state.state);
 	}
@@ -66,7 +67,7 @@ public class UCS {
 		return children;
 	}
 
-
+	//check if state is final
 	public boolean isFinalState(State state) {
 		char[] fState = state.state.toCharArray();
 		int blacks = 0;
@@ -74,7 +75,7 @@ public class UCS {
 		for(int i=0; i<fState.length; i++){
 			if (fState[i] == 'M')
 				blacks++;
-			else if(fState[i] == 'A' && blacks < (fState.length-1)/2)//all blacks need to be left
+			else if(fState[i] == 'A' && blacks < (fState.length-1)/2)//all blacks need on be left
 				return false;
 			else if(i == fState.length-1 && fState[i] != 'A')//last needs to be white
 				return false;
@@ -84,7 +85,6 @@ public class UCS {
 
 	//find final state with min cost
 	public State findBestSolution() {
-		//System.out.println(finalStates);
 		State minState = finalStates.get(0);
 		for (State state: finalStates)
 			if (state.cost<minState.cost)
@@ -100,9 +100,9 @@ public class UCS {
 
 		for (char c: chars) {
 			if (c == 'M')
-				blacks++;
+				blacks++; //count blacks
 			else if (c == 'A')
-				whites++;
+				whites++; //count whites
 			else if (c == '-' && !dash) //exactly one dash
 				dash = true;
 			else return false;
@@ -125,24 +125,20 @@ public class UCS {
 		State state = new State(input, 0);
 		ucs.addToFrontier(state);//Step 1
 		ArrayList<State> children;
-		//System.out.printf("Starting state is:%s\n",state);
+
 		while(!ucs.frontierIsEmpty()){//Step 2
-			//System.out.printf("Removing state %s from frontier\n",state);
 			state = ucs.removeFromFrontier();//Step 3
 			if (ucs.inClosedSet(state))//Step 4
 				continue;
 			if (ucs.isFinalState(state)){//Step 5
-				//System.out.printf("State %s is Final add to Fstate list\n",state);
 				ucs.addFinalState(state);
-				continue;//6
+				continue;//Step 6
 			}
-			//System.out.printf("Creating children of state %s\n",state);
 			children = ucs.createChildren(state);//Step 7
-			//System.out.printf("Adding children of state %s to frontier\n",state);
+
 			for (State child: children)
 				ucs.addToFrontier(child);//Step 8
 			extensions++;
-			//System.out.printf("Adding state %s to Closed Set\n",state);
 			ucs.addToClosedSet(state);//Step 9
 		}
 		State solution = ucs.findBestSolution();
@@ -175,9 +171,5 @@ public class UCS {
 				result += state + " ";
 			return result;
 		}
-		//used for tests
-		/*public String toString(){
-			return state+':'+cost;
-		}/**/
 	}
 }

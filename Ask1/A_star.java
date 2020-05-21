@@ -29,7 +29,8 @@ public class A_star {
 	public boolean frontierIsEmpty() {
 		return frontier.size() == 0;
 	}
-	//closed set
+
+	//check if state is in closed set
 	public boolean inClosedSet(State state) {
 		return closedSet.contains(state.state);
 	}
@@ -60,7 +61,7 @@ public class A_star {
 		return children;
 	}
 
-
+	//check it state is final
 	public boolean isFinalState(State state) {
 		char[] fState = state.state.toCharArray();
 		int blacks = 0;
@@ -84,9 +85,9 @@ public class A_star {
 
 		for (char c: chars) {
 			if (c == 'M')
-				blacks++;
+				blacks++; //count blacks
 			else if (c == 'A')
-				whites++;
+				whites++; //count whites
 			else if (c == '-' && !dash) //exactly one dash
 				dash = true;
 			else return false;
@@ -100,6 +101,7 @@ public class A_star {
 		Scanner scanner = new Scanner(System.in);
 		String input = "";
 		int extensions = 0;
+		
 		//Get Starting state
 		while(!astar.isValidState(input)) {
 			System.out.print("Give me a starting state: ");
@@ -109,22 +111,19 @@ public class A_star {
 		State state = new State(input, 0);
 		astar.addToFrontier(state);//Step 1
 		ArrayList<State> children;
+
 		while(!astar.frontierIsEmpty()) {//Step 2
-			//System.out.printf("Removing state %s from frontier\n",state);
 			state = astar.removeFromFrontier();//Step 3
 			if (astar.inClosedSet(state))//Step 4
 				continue;
-			//Should stop here for Greedy Search
+			//Should stop here for A_star
 			if (astar.isFinalState(state)) {//Step 5
 				break;
 			}
-			//System.out.printf("Creating children of state %s\n",state);
 			children = astar.createChildren(state);//Step 6
-			//System.out.printf("Adding children of state %s to frontier\n",state);
 			for (State child: children)
 				astar.addToFrontier(child);//Step 7
 			extensions++;
-			//System.out.printf("Adding state %s to Closed Set\n",state);
 			astar.addToClosedSet(state);//Step 8
 		}
 		System.out.printf("Best path is: %s\nCost is %d\n", state.getPath(), state.cost);
@@ -157,13 +156,10 @@ public class A_star {
 			ArrayList<Integer> whites = new ArrayList<Integer>();
 			int cost = 0, pos;
 			//find the pos of all whites on left side
-			//System.out.println("find whites");
 			for (int c=0; c<=N;c++){
-				//System.out.println(chars[c]);
 				if (chars[c] == 'A')
 					whites.add(c);
 			}
-			//System.out.println("done whites");
 			//no whites on left side
 			if (whites.size() == 0)
 				return 0;
@@ -185,9 +181,5 @@ public class A_star {
 				result += state + " ";
 			return result;
 		}
-		//used for tests
-		/*public String toString() {
-			return state+':'+cost;
-		}/**/
 	}
 }
