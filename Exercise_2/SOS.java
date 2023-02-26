@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.lang.Math;
 import java.util.Scanner;
 
-public class SOS {
+public class ticTacToeMinimax {
 
 	//creates children of state
 	public static void createChildren(State state) {
